@@ -1,0 +1,39 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract BlockchainSecuritySuite is Ownable {
+    event AccessGranted(address indexed account);
+    event AccessRevoked(address indexed account);
+
+    mapping(address => bool) private whitelist;
+
+    constructor() {
+        whitelist[msg.sender] = true; // Owner has access by default
+    }
+
+    modifier onlyWhitelisted() {
+        require(whitelist[msg.sender], "You are not authorized");
+        _;
+    }
+
+    function grantAccess(address account) external onlyOwner {
+        whitelist[account] = true;
+        emit AccessGranted(account);
+    }
+
+    function revokeAccess(address account) external onlyOwner {
+        whitelist[account] = false;
+        emit AccessRevoked(account);
+    }
+
+    function checkAccess(address account) external view returns (bool) {
+        return whitelist[account];
+    }
+
+    function doSomethingSecure() external onlyWhitelisted {
+        // Only whitelisted addresses can call this function
+        // Perform secure actions here
+    }
+}
